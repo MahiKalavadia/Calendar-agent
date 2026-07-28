@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import logging
 from services import load_events, save_events
 from logger import logger
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 load_dotenv()
 
@@ -16,14 +16,31 @@ def create_event(title: str, date: str, start_time: str, duration:str = "1 hour"
         logger.info("Create event tool called!")
         events = load_events()
         logger.info(f"Events loaded {events}")
+
+        try:
+            new_start = datetime.strptime(start_time, "%H:%M")
+            new_end = new_start + timedelta(hours=1)
+        except ValueError:
+            new_start = new_end = None
+
         for event in events:
-            if event["date"] == date and event["start_time"] == start_time:
-                return f"You already have an event at {start_time} on {date}."
+            if event["date"] == date:
+                if new_start:
+                    try:
+                        ev_start = datetime.strptime(event["start_time"], "%H:%M")
+                        ev_end = ev_start + timedelta(hours=1)
+                        if max(new_start, ev_start) < min(new_end, ev_end):
+                            return f"You already have an event '{event['title']}' from {event['start_time']} to {ev_end.strftime('%H:%M')} on {date}."
+                    except ValueError:
+                        pass
+                if event["start_time"] == start_time:
+                    return f"You already have an event at {start_time} on {date}."
+
         event = {
             "title": title,
             "date": date,
             "start_time": start_time,
-            "duration":duration
+            "duration": duration
         }
         logger.info("Events appending....")
         events.append(event)
@@ -34,8 +51,8 @@ def create_event(title: str, date: str, start_time: str, duration:str = "1 hour"
     except Exception as e:
         logger.error(f"Exception occurred while creating event {str(e)}")
         return "Error while creating event!!"
- 
- 
+
+
 @tool
 def get_events(date: str) -> str:
     """
@@ -61,9 +78,9 @@ def get_events(date: str) -> str:
         logger.info(f"Events available: {response}")
         return "\n".join(response)
     except Exception as e:
-            logger.error(f"Exception occurred while loading events {str(e)}")
-            return "Error while loading events!!"
- 
+        logger.error(f"Exception occurred while loading events {str(e)}")
+        return "Error while loading events!!"
+
 @tool
 def check_availability(date: str, time: str) -> str:
     """
@@ -73,16 +90,33 @@ def check_availability(date: str, time: str) -> str:
         logger.info(f"Check availability tool called!")
         events = load_events()
         logger.info(f"Events: {events}")
+
+        try:
+            req_time = datetime.strptime(time, "%H:%M")
+        except ValueError:
+            req_time = None
+
         for event in events:
-            if event["date"] == date and event["start_time"] == time:
-                logger.info(f"You are busy with another event {event["title"]}")
-                return f"You are busy with '{event['title']}' from {time}."
+            if event["date"] == date:
+                if req_time:
+                    try:
+                        ev_start = datetime.strptime(event["start_time"], "%H:%M")
+                        ev_end = ev_start + timedelta(hours=1)
+                        if ev_start <= req_time < ev_end:
+                            logger.info(f"You are busy with another event {event['title']}")
+                            return f"You are busy with '{event['title']}' from {event['start_time']} to {ev_end.strftime('%H:%M')}."
+                    except ValueError:
+                        pass
+                if event["start_time"] == time:
+                    logger.info(f"You are busy with another event {event['title']}")
+                    return f"You are busy with '{event['title']}' from {time}."
+
         return f"You are available on {date} at {time}."
     except Exception as e:
-            logger.error(f"Exception occurred while checking availability {str(e)}")
-            return "Error while checking availability!!"
- 
- 
+        logger.error(f"Exception occurred while checking availability {str(e)}")
+        return "Error while checking availability!!"
+
+
 @tool
 def cancel_event(date: str, time: str) -> str:
     """
@@ -101,7 +135,5 @@ def cancel_event(date: str, time: str) -> str:
                 return "Event cancelled successfully."
         return "No event found for the given date and time."
     except Exception as e:
-            logger.error(f"Exception occurred while cancelling event {str(e)}")
-            return "Error while cancelling event!!"
- 
- 
+        logger.error(f"Exception occurred while cancelling event {str(e)}")
+        return "Error while cancelling event!!"
