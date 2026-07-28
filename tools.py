@@ -1,6 +1,6 @@
 from langchain_core.tools import tool
 from dotenv import load_dotenv
-import logging
+from schemas import GetEvents
 from services import load_events, save_events
 from logger import logger
 from datetime import datetime, timedelta
@@ -19,7 +19,9 @@ def create_event(title: str, date: str, start_time: str, duration:str = "1 hour"
 
         try:
             new_start = datetime.strptime(start_time, "%H:%M")
-            new_end = new_start + timedelta(hours=1)
+            clean_duration = int(duration.split()[0])
+            print(clean_duration)
+            new_end = new_start + timedelta(hours=clean_duration)
         except ValueError:
             new_start = new_end = None
 
@@ -27,8 +29,9 @@ def create_event(title: str, date: str, start_time: str, duration:str = "1 hour"
             if event["date"] == date:
                 if new_start:
                     try:
+                        clean_duration = int(event["duration"].split()[0])
                         ev_start = datetime.strptime(event["start_time"], "%H:%M")
-                        ev_end = ev_start + timedelta(hours=1)
+                        ev_end = ev_start + timedelta(hours=clean_duration)
                         if max(new_start, ev_start) < min(new_end, ev_end):
                             return f"You already have an event '{event['title']}' from {event['start_time']} to {ev_end.strftime('%H:%M')} on {date}."
                     except ValueError:
@@ -54,7 +57,7 @@ def create_event(title: str, date: str, start_time: str, duration:str = "1 hour"
 
 
 @tool
-def get_events(date: str) -> str:
+def get_events(date: str):
     """
     Get all events for a particular date.
     """
@@ -100,8 +103,9 @@ def check_availability(date: str, time: str) -> str:
             if event["date"] == date:
                 if req_time:
                     try:
+                        clean_duration = int(event["duration"].split()[0])
                         ev_start = datetime.strptime(event["start_time"], "%H:%M")
-                        ev_end = ev_start + timedelta(hours=1)
+                        ev_end = ev_start + timedelta(hours=clean_duration)
                         if ev_start <= req_time < ev_end:
                             logger.info(f"You are busy with another event {event['title']}")
                             return f"You are busy with '{event['title']}' from {event['start_time']} to {ev_end.strftime('%H:%M')}."
@@ -117,7 +121,7 @@ def check_availability(date: str, time: str) -> str:
         return "Error while checking availability!!"
 
 
-@tool
+@tool()
 def cancel_event(date: str, time: str) -> str:
     """
     Cancel an event using date and time.

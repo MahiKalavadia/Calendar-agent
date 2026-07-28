@@ -53,6 +53,6 @@ def query(request: ChatRequest):
  
     except Exception as e:
         logger.error(f"Exception occurred: {str(e)}")
-        return ChatResponse(output=f"An error occurred: {str(e)}")
+        return ChatResponse(output="We encountered an issue processing your requests. Please try again later!")
     finally:
         langfuse.flush()
