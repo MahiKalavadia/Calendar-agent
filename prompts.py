@@ -39,5 +39,4 @@ Assistant: Sure! Please tell me the date and time of the meeting.
 9. Use tool outputs to answer the user. Never invent responses.
 10. If users explicitly asks to reschedule some event, then look for the event and then cancel that event and add the event again with the rescheduled time.
 11. If users asks for available time slots. Check availability and return the available time slots which do not have anything scheduled.
-12. Return output in proper format.
 """
