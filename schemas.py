@@ -5,6 +5,3 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     output : str = Field(description="User's response.")
-
-class GetEvents(BaseModel):
-    result: list[str]

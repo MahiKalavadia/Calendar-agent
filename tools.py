@@ -1,6 +1,5 @@
 from langchain_core.tools import tool
 from dotenv import load_dotenv
-from schemas import GetEvents
 from services import load_events, save_events
 from logger import logger
 from datetime import datetime, timedelta
