@@ -56,7 +56,7 @@ def create_event(title: str, date: str, start_time: str, duration:str = "1 hour"
 
 
 @tool
-def get_events(date: str):
+def get_events(date: str = ""):
     """
     Get all events for a particular date.
     """
@@ -84,9 +84,9 @@ def get_events(date: str):
         return "Error while loading events!!"
 
 @tool
-def check_availability(date: str, time: str) -> str:
+def check_availability(date: str, time: str = "") -> str:
     """
-    Check whether a time slot is available.
+    Check the availability of the time slots provided by user.
     """
     try:
         logger.info(f"Check availability tool called!")
@@ -120,10 +120,10 @@ def check_availability(date: str, time: str) -> str:
         return "Error while checking availability!!"
 
 
-@tool()
-def cancel_event(date: str, time: str) -> str:
+@tool
+def cancel_event(date: str, time: str = "") -> str:
     """
-    Cancel an event using date and time.
+    Cancel an event. Default date is today
     """
     try:
         logger.info(f"Cancel event tool called!")
