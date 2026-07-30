@@ -50,7 +50,7 @@ def query(request: ChatRequest):
                     }
         )
         logger.info(f"Invoked the agent.")
-        answer = response["messages"][-1].content
+        answer = response["messages"][-1].text
         logger.info(f"Response received: {answer}")
         return ChatResponse(output=answer)
  
