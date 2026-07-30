@@ -43,7 +43,10 @@ def query(request: ChatRequest):
                 ]
             },
             config = {
-                        "callbacks" : [langfuse_handler]
+                        "callbacks" : [langfuse_handler],
+                        "configurable":{
+                            "thread_id":"1"
+                        }
                     }
         )
         logger.info(f"Invoked the agent.")
