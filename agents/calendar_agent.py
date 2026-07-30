@@ -9,7 +9,6 @@ from tools.check_availability import check_availability
 from dotenv import load_dotenv
 from langgraph.checkpoint.memory import InMemorySaver
 import logging
-from middleware.parallel_tool_middleware import DisableParallelToolCallsMiddleware
 
 load_dotenv()
 
