@@ -6,10 +6,13 @@ from datetime import datetime, timedelta
 import json
 from langchain_core.messages import HumanMessage
 from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 load_dotenv()
 
-llm = ChatGroq(model="llama-3.3-70b-versatile")
+# llm = ChatGroq(model="llama-3.3-70b-versatile")
+llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash")
+today = datetime.now()
 
 @tool
 def create_event(title: str | None, date: str, start_time: str, duration:str = "1 hour") -> str:
@@ -70,9 +73,15 @@ def create_event(title: str | None, date: str, start_time: str, duration:str = "
 
 
 @tool
-def get_events(date: str | None):
+def get_events(date: str | None = today):
     """
-    Get/Show all the events
+    Retrieve all the existing events for the specified date.
+
+    Args:
+    - date: The date should be in format YYYY-MM-DD. If date not provided default date is today's date.
+
+    Returns:
+    - Returns a formatted list of scheduled events or message indicating no events available.
     """
     try:
         logger.info("Get Events tool called!")
@@ -98,9 +107,16 @@ def get_events(date: str | None):
         return "Error while loading events!!"
 
 @tool
-def check_availability(date: str, time: str = "") -> str:
+def check_availability(time: str = "", date: str | None =  today) -> str:
     """
-    Checks the availability of the time slots.
+    Checks the availability for the available time slots for the specified date.
+
+    Args:
+    - date: The date should be in format YYYY-MM-DD. Default date is today's date.
+    - time: The time in 24-hour HH:MM format. If time not provided check every time for today.
+
+    Returns:
+    - Returns all the available slots for the specified date and time and if not available return you are occupied. 
     """
     try:
         logger.info(f"Check availability tool called!")
@@ -133,60 +149,25 @@ def check_availability(date: str, time: str = "") -> str:
         logger.error(f"Exception occurred while checking availability {str(e)}")
         return "Error while checking availability!!"
 
-
 @tool
-def cancel_event(query:str | None) -> str:
+def cancel_event(date: str| None, time: str | None) -> str:
     """
     Cancel an existing calendar event specified by user.
+
+    Args:
+    - date: The date of the event in format YYYY-MM-DD
+    - time: The time in 24-hour HH:MM format.
+
+    Returns:
+    - returns a message indicating event is cancelled or a message indicating that no matching event found!.
+
     """
     try:
         logger.info(f"Cancel event tool called!")
         events = load_events()
         logger.info(f"Events: {events}")
-
-        prompt = f"""
-        You are an event matching assitant.
-
-        User's statement:
-        {query}
-
-        Already existing events:
-        {json.dumps(events, indent=2)}
-
-        Instruction:
-        - identify the best matching event.
-        - Return only the date of the retrieved event from the existing events.
-        - No extra information or text needed.
-        - Just the date in format YYYY-MM-DD.
-        """
-
-        prompt2 = f"""
-        You are an event matching assitant.
-
-        User's statement:
-        {query}
-
-        Already existing events:
-        {json.dumps(events, indent=2)}
-
-        Instruction:
-        - identify the best matching event.
-        - Return only the start time of the retrieved event.
-        - No extra information or text needed.
-        - Just the time in HH:MM
-        """
-
-        
-        llm_response = llm.invoke([HumanMessage(content=prompt)])
-        logger.info(f"Response received by llm for date: {llm_response}")
-        llm_response2 = llm.invoke([HumanMessage(content=prompt2)])
-        logger.info(f"Response received by llm for time: {llm_response2}")
-        event_date = llm_response.content.strip()
-        logger.info(f"Date received by llm: {event_date}")
-        event_time = llm_response2.content.strip()
-        logger.info(f"Time received by llm: {event_time}")
         for event in events:
-            if event["date"] == event_date and event["start_time"] == event_time:
+            if event["date"] == date and event["start_time"] == time:
                 logger.info(f"Removing event.. {event}")
                 events.remove(event)
                 logger.info(f"Saving...")
