@@ -72,7 +72,7 @@ def create_event(title: str | None, date: str, start_time: str, duration:str = "
 @tool
 def get_events(date: str | None):
     """
-    Get all the events
+    Get/Show all the events
     """
     try:
         logger.info("Get Events tool called!")
@@ -100,15 +100,7 @@ def get_events(date: str | None):
 @tool
 def check_availability(date: str, time: str = "") -> str:
     """
-    Checks the availability of the slots by comparing the given date and time with the existing events.
-    Do not ask for time range if the query asked by user doesn't quite need time.
-
-    Args:
-    - date: The date provided in format YYYY-MM-DD. Default date is today.
-    - time: The time in  24-hour HH:MM format.
-
-    Returns:
-    - Returns if the time slot is available or the time slots that are currently available or the message indicating the time slot is occupied.
+    Checks the availability of the time slots.
     """
     try:
         logger.info(f"Check availability tool called!")
