@@ -109,10 +109,10 @@ def get_events(date: str | None = today):
 @tool
 def check_availability(time: str = "", date: str | None =  today) -> str:
     """
-    Checks the availability for the available time slots for the specified date.
+    Checks the availability for the available time slots for the specified date. If date not provided set today's date as default.
 
     Args:
-    - date: The date should be in format YYYY-MM-DD. Default date is today's date.
+    - date: The date should be in format YYYY-MM-DD.
     - time: The time in 24-hour HH:MM format. If time not provided check every time for today.
 
     Returns:
