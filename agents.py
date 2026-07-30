@@ -12,7 +12,7 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash")
-model = ChatGroq(model="llama-3.3-70b-versatile")
+# model = ChatGroq(model="llama-3.3-70b-versatile")
 memory = InMemorySaver()
 
 TOOLS = [
@@ -25,7 +25,7 @@ TOOLS = [
 logger.info("Creating agent!")
 
 agent = create_agent(
-    model=model,
+    model=llm,
     tools=TOOLS,
     system_prompt=SYSTEM_PROMPT,
     checkpointer=memory
