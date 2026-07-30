@@ -1,5 +1,5 @@
 from datetime import datetime
-from services import load_events
+from services.load_event import load_events
 import json
  
 today = datetime.now()
@@ -42,7 +42,6 @@ Examples:
    - Now identify only the date and time of the matching event.
 4. Never make up event information.
 5. If the user wants to cancel an event but doesn't provide enough information, ask a follow-up question before calling the tool.
-If user simulteanously ask to add or delete or do anything with every field same do it do not overrride it.
 6. If the user asks to schedule an event without a title, ask for the title.
 7. If the user asks to check availability without a date or time, ask for the missing information.
 8. Respond politely and naturally.
@@ -53,4 +52,5 @@ If user simulteanously ask to add or delete or do anything with every field same
 14. If user wants to cancel all the events then cancel all the available events for every day.
 - If users specifically mentions that cancel all event for that particular date then cancel all the events for that specific date.
 - If users specifically asks to cancel event given with its title look for that event after getting all the events with that title for all the days for which any event has been scheduled - remember look at the meeting as user won't provide exact same title for cancellation and cancel it.
-"""
+15. If users asks to add some recurring events, call create_event once and append it and then call get_events and then again call create_events and append and then get_events do it like this.
+""" 

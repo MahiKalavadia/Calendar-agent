@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from langfuse import get_client
 from langfuse.langchain import CallbackHandler
-from agents import agent
+from agents.calendar_agent import agent
 from schemas import ChatRequest, ChatResponse
-from logger import logger
+from log_file.logs import logger
 from dotenv import load_dotenv
 
 load_dotenv()

@@ -1,5 +1,5 @@
 import json, os
-from logger import logger
+from log_file.logs import logger
 
 CALENDAR_DIR = "calendar"
 if not os.path.exists(CALENDAR_DIR):
@@ -25,12 +25,3 @@ def load_events():
     except Exception as e:
         logger.error(f"Exception occurred while loading events: {str(e)}")
         return []
-
-def save_events(event):
-    """Create a new event in calender for the event with its specific datetime and duration"""
-    try:
-        os.makedirs(CALENDAR_DIR, exist_ok=True)
-        with open(os.path.join(CALENDAR_DIR, calender_filename), 'w') as f:
-            json.dump(event, f, indent=4)
-    except Exception as e:
-        logger.error(f"Exception occurred while saving events: {str(e)}")
